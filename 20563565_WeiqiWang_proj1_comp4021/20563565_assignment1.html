@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Autocomplete - Categories</title>
+  <link rel="stylesheet" href="jquery-ui.css">
+  <script src="jquery-1.11.3.js"></script>
+  <script src="jquery-ui.js"></script>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .ui-autocomplete-category {
+      color: red;
+      font-weight: bold;
+      padding: 0.2em 0.4em;
+      margin: 0.8em 0.2em;
+      line-height: 1.5;
+    }
+
+    .ui-autocomplete {
+      max-height: 200px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .match-character {
+      color: blue;
+      font-weight: bold;
+    }
+
+    .unmatched-character {
+      color: black;
+      font-weight: bold;
+    }
+
+    li.focused {
+      font-size: 16px;
+    }
+  </style>
+  <script>
+    function myAutoCompleteWidget() {
+      this._super();
+      this.widget().menu("option", "items", "> :not(.ui-autocomplete-category)");
+    };
+    function renderAutoCompleteMenuItem(ul, item) {
+      terms = this.term.split(',');
+      term = terms[terms.length - 1].trim();
+      var re = new RegExp(term, "g");
+      var t = item.label.replace(re, "<span class='match-character'>" + term + "</span>");
+      return $("<li style='font-weight: bold;'></li>").append(t).appendTo(ul);
+    };
+    function renderAutoCompleteMenu(ul, items) {
+      var that = this;
+      currentCategory = "";
+      $.each(items, function (index, item) {
+        var li;
+        if (item.category != currentCategory) {
+          ul.append("<li class='ui-autocomplete-category'>" + item.category + "</li>");
+          currentCategory = item.category;
+        }
+        li = that._renderItemData(ul, item);
+        if (item.category) {
+          li.attr("aria-label", item.category + " : " + item.label);
+        }
+      });
+    };
+    $.widget("custom.myautocomplete", $.ui.autocomplete, {
+      _create: myAutoCompleteWidget,
+      _renderItem: renderAutoCompleteMenuItem,
+      _renderMenu: renderAutoCompleteMenu
+    });
+  </script>
+  <script>
+    var data = [
+      { label: "The Great Kobe Bryant", category: "" },
+      { label: "Michael Jordan", category: "" },
+      { label: "Shaquille ONeal", category: "" },
+      { label: "Dirk Nowitzki", category: "" },
+      { label: "Dwayne Wade", category: "" },
+      { label: "Chris Bosh", category: "" },
+      { label: "Tim Duncan", category: "" },
+      { label: "Kevin Garnett", category: "" },
+      { label: "Steve Nash", category: "" },
+      { label: "Ray Allen", category: "" },
+      { label: "Tracy Mcgrady", category: "" },
+      { label: "Allen Iverson", category: "" },
+      { label: "Yao Ming", category: "" },
+      { label: "Lebron James", category: "Lakers" },
+      { label: "Anthony Davis", category: "Lakers" },
+      { label: "Rajon Rondo", category: "Lakers" },
+      { label: "Dwight Howard", category: "Lakers" },
+      { label: "Kyle Kuzma", category: "Lakers" },
+      { label: "Javale McGee", category: "Lakers" },
+      { label: "Danny Green", category: "Lakers" },
+      { label: "Markieff Morris", category: "Lakers" },
+      { label: "Jimmy Butler", category: "Heats" },
+      { label: "Duncan Robinson", category: "Heats" },
+      { label: "Tyler Herro", category: "Heats" },
+      { label: "Bam Adebayo", category: "Heats" },
+      { label: "Solomon Hill", category: "Heats" },
+      { label: "Goran Dragic", category: "Heats" },
+      { label: "Stephen Curry", category: "Warriors" },
+      { label: "Draymond Green", category: "Warriors" },
+      { label: "Damion Lee", category: "Warriors" },
+      { label: "Kevon Looney", category: "Warriors" },
+      { label: "Eric Paschall", category: "Warriors" },
+      { label: "Jordan Poole", category: "Warriors" },
+      { label: "Klay Thompson", category: "Warriors" },
+      { label: "Andrew Wiggins", category: "Warriors" },
+      { label: "Wilson Chandler", category: "Nets" },
+      { label: "Kyrie Irving", category: "Nets" },
+      { label: "Kevin Durant", category: "Nets" },
+      { label: "Joe Harris", category: "Nets" },
+      { label: "DeAndre Jordan", category: "Nets" },
+      { label: "Caris Levert", category: "Nets" },
+      { label: "Dinwiddie Spencer", category: "Nets" },
+      { label: "Claxton Nicolas", category: "Nets" },
+      { label: "Allen Jarrett", category: "Nets" }
+    ];
+    function split(val) {
+      return val.split(/,\s*/);
+    }
+    function extractLast(term) {
+      return split(term).pop();
+    }
+
+    function keydownHandler(event) {
+      if (event.keyCode === $.ui.keyCode.TAB &&
+        $(this).autocomplete("instance").menu.active) {
+        event.preventDefault();
+      }
+    };
+
+    function autocompleteSourceHandler(request, response) {
+      response($.ui.autocomplete.filter(
+        data, extractLast(request.term)));
+    };
+
+    function autocompleteItemSelectedHandler(event, ui) {
+      var terms = split(this.value);
+      terms.pop();
+      terms.push(ui.item.value);
+      terms.push("");
+      this.value = terms.join(", ");
+      return false;
+    };
+
+    function onDocumentReady() {
+      $("#search").myautocomplete({
+        delay: 0,
+        minLength: 1,
+        source: autocompleteSourceHandler,
+        select: autocompleteItemSelectedHandler,
+      });
+    };
+    $(document).ready(onDocumentReady);
+  </script>
+</head>
+
+<body>
+
+  <label for="search">Search: </label>
+  <input id="search">
+
+</body>
+
+</html>
