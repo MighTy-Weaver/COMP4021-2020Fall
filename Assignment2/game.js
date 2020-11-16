@@ -128,6 +128,7 @@ var disappearing_platform_2 = null;         // the disappearing platform object 
 var disappearing_platform_3 = null;           // the disappearing platform object 3
 var time_remaining = 5;                     // remaining time of the game
 var timer = null;                           // the timer to count down the time
+var monster_timer = null;                     // the time to count down the monster shooting
 var player_name = "Enter your name here";   // the variable to store the input name
 var player_nametag = null;                  // the object of the name tag displayed
 var player_in_portal = false;               // If the player run into the portal or not
@@ -173,6 +174,7 @@ function load() {
     //restart timer
     clearInterval(gameInterval);
     clearInterval(timer);
+    clearTimeout(monster_timer);
     time_remaining = 100;
     // Create the player
     player = new Player();
@@ -219,7 +221,8 @@ function game_end() {
     game_over_sound.play();
     clearInterval(gameInterval);
     clearInterval(timer);
-    score_table = getHighScoreTable();
+    clearTimeout(monster_timer);
+    let score_table = getHighScoreTable();
     player_name = player.name;
     var score_record = new ScoreRecord(player.name, total_score);
     var record_length = score_table.length;
@@ -394,7 +397,7 @@ function shootBullet() {
 // This is the function to shoot special_bullet
 function shootMonsterBullet(position, moving_right) {
     canMonsterShoot = false;
-    setInterval("canMonsterShoot = true", 2000);
+    monster_timer = setTimeout("canMonsterShoot = true", 2500);
     var bullet = document.createElementNS("http://www.w3.org/2000/svg", "use");
     if (moving_right)
         bullet.setAttribute("direction", motionType.RIGHT);

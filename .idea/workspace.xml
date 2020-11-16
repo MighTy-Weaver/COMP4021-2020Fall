@@ -67,7 +67,8 @@
       <workItem from="1605514981708" duration="6212000" />
       <workItem from="1605530509069" duration="97000" />
       <workItem from="1605530767897" duration="585000" />
-      <workItem from="1605532354189" duration="797000" />
+      <workItem from="1605532354189" duration="833000" />
+      <workItem from="1605533413487" duration="306000" />
     </task>
     <task id="LOCAL-00001" summary="assignment1 and 2 updated">
       <created>1605527802571</created>
@@ -146,7 +147,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605531054410</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="change timeout to interval">
+      <created>1605533177072</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1605533177072</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -175,7 +183,8 @@
     <MESSAGE value="rename folders" />
     <MESSAGE value="README.txt update" />
     <MESSAGE value="fix the bug of monster bullet" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix the bug of monster bullet" />
+    <MESSAGE value="change timeout to interval" />
+    <option name="LAST_COMMIT_MESSAGE" value="change timeout to interval" />
   </component>
   <component name="WindowStateProjectService">
     <state x="492" y="213" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1605529558901">
@@ -186,10 +195,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="153" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1605527832262" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1605531344960">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1605533179883">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1605531344960" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1605533179883" />
     <state x="573" y="325" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605529105641">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
