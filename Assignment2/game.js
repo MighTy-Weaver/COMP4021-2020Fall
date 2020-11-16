@@ -394,7 +394,7 @@ function shootBullet() {
 // This is the function to shoot special_bullet
 function shootMonsterBullet(position, moving_right) {
     canMonsterShoot = false;
-    setTimeout("canMonsterShoot = true", 2000);
+    setInterval("canMonsterShoot = true", 2000);
     var bullet = document.createElementNS("http://www.w3.org/2000/svg", "use");
     if (moving_right)
         bullet.setAttribute("direction", motionType.RIGHT);
