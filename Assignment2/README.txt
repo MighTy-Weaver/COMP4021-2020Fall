@@ -10,3 +10,6 @@ Aside from this, I haven't discover any other bugs.
 
 Note that there is a time interval between two transmitting through the portals.
 Also, there is also a shooting interval.
+
+The animation for the monsters are scaling, I try to make it looks like "breathing" lol.
+And be careful that the flipping of monsters are not transparent, but they are flipped when walking left or right.
