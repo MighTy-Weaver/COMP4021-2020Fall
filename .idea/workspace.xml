@@ -10,7 +10,11 @@
   <component name="ComposerSettings">
     <execution />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1kMRbVEu6iGcRQZcyU0FdPVedlr" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -36,11 +40,23 @@
       <option name="presentableId" value="Default" />
       <updated>1605508546581</updated>
       <workItem from="1605508548064" duration="363000" />
-      <workItem from="1605514981708" duration="3518000" />
+      <workItem from="1605514981708" duration="3937000" />
     </task>
+    <task id="LOCAL-00001" summary="assignment1 and 2 updated">
+      <created>1605527802571</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1605527802571</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="assignment1 and 2 updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="assignment1 and 2 updated" />
   </component>
 </project>
