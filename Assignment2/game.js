@@ -545,6 +545,21 @@ function collisionDetection() {
                 return;
             }
         }
+    // Check whether a player collides with the monster's bullet
+    if (!cheat) {
+        var bullets = document.getElementById("bullets");
+        for (var i = 0; i < bullets.childNodes.length; i++) {
+            var bullet = bullets.childNodes.item(i);
+            if (bullet.getAttribute("player_shoot") == "false") {
+                var x = parseInt(bullet.getAttribute("x"));
+                var y = parseInt(bullet.getAttribute("y"));
+                if (intersect(new Point(x, y), BULLET_SIZE, player.position, PLAYER_SIZE)) {
+                    game_end();
+                    return;
+                }
+            }
+        }
+    }
     // Check whether the monster collides with a bullet
     var bullets = document.getElementById("bullets");
     for (var i = 0; i < bullets.childNodes.length; i++) {
