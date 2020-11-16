@@ -740,11 +740,11 @@ function moveMonsters() {
     var monsters = document.getElementById("monsters");
     for (var i = 0; i < monsters.childNodes.length; ++i) {
         var monster = monsters.childNodes.item(i);
+        var monster_direction = monster.getAttribute("m_direction");
         var original_position = new Point(parseFloat(monster.getAttribute("x")), parseFloat(monster.getAttribute("y")));
         if (monster.getAttribute("shooter") == "yes" && canMonsterShoot)
-            shootMonsterBullet(original_position, player.x > original_position.x);
+            shootMonsterBullet(original_position, monster_direction == "right");
         var moved_position = new Point(parseFloat(monster.getAttribute("x")), parseFloat(monster.getAttribute("y")));
-        var monster_direction = monster.getAttribute("m_direction");
         if (monster_on_platform(monster)) {
             if (monster_direction == "left") {
                 moved_position.x -= 1;
@@ -896,6 +896,14 @@ function updateScreen() {
             monster.setAttribute("transform", " translate(" + (2 * monster_x + MONSTER_SIZE.w) + ", 0) scale(-1, 1)");
         } else {
             monster.setAttribute("transform", "");
+        }
+    }
+    for (var i = 0; i < document.getElementById("bullets").childNodes.length; i++) {
+        var bullet = document.getElementById("bullets").childNodes.item(i);
+        if (bullet.getAttribute("direction") == motionType.LEFT) {
+            bullet.setAttribute("transform", " translate(" + (2 * bullet.getAttribute("x") + BULLET_SIZE.w) + ", 0) scale(-1, 1)");
+        } else {
+            bullet.setAttribute("transform", "");
         }
     }
     //player's name tag

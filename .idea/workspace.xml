@@ -68,7 +68,7 @@
       <workItem from="1605530509069" duration="97000" />
       <workItem from="1605530767897" duration="585000" />
       <workItem from="1605532354189" duration="833000" />
-      <workItem from="1605533413487" duration="306000" />
+      <workItem from="1605533413487" duration="758000" />
     </task>
     <task id="LOCAL-00001" summary="assignment1 and 2 updated">
       <created>1605527802571</created>
@@ -154,7 +154,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605533177072</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="fix the bug of infinite shooting">
+      <created>1605533828073</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1605533828073</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,7 +191,8 @@
     <MESSAGE value="README.txt update" />
     <MESSAGE value="fix the bug of monster bullet" />
     <MESSAGE value="change timeout to interval" />
-    <option name="LAST_COMMIT_MESSAGE" value="change timeout to interval" />
+    <MESSAGE value="fix the bug of infinite shooting" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix the bug of infinite shooting" />
   </component>
   <component name="WindowStateProjectService">
     <state x="492" y="213" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1605529558901">
