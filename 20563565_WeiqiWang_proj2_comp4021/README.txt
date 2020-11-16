@@ -7,3 +7,6 @@ C to cheat on, V to cheat off, K to kill all the monsters (usually just for fast
 To be honest, there are still bug that may not be perfect.
 Such as, the bullet shoot from the purple monster can't kill the player.
 Aside from this, I haven't discover any other bugs.
+
+Note that there is a time interval between two transmitting through the portals.
+Also, there is also a shooting interval.
