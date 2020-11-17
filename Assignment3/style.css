@@ -1,0 +1,27 @@
+body {
+    font-family: Trebuchet MS, sans-serif;
+    font-weight: bold;
+    margin: 0px;
+    padding: 5px;
+    background: #e0e0ff;
+    width: 800px;
+    text-align: center;
+}
+form {
+    margin: 0px;
+    padding: 0px;
+}
+input.text {
+    font-family: Trebuchet MS, sans-serif;
+    font-size: 12pt;
+    border: 1px solid black;
+    background: white;
+}
+input.button {
+    font-family: Trebuchet MS, sans-serif;
+    font-size: 10pt;
+    border: 1px solid black;
+    border-top: 1px solid gray;
+    border-left: 1px solid gray;
+    background: lightgray;
+}
