@@ -1,0 +1,1831 @@
+Index: Assigment3 chatroom PHP project/login.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/login.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/login.php	(date 1515068675000)
+@@ -0,0 +1,38 @@
++<?php
++
++// if name is not in the post data, exit
++if (!isset($_POST["name"])) {
++    header("Location: error.html");
++    exit;
++}
++
++require_once('xmlHandler.php');
++
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++if (!$xmlh->fileExist()) {
++    header("Location: error.html");
++    exit;
++}
++
++// open the existing XML file
++$xmlh->openFile();
++
++// get the 'users' element
++$users_element = $xmlh->getElement("users");
++
++// create a 'user' element
++$user_element = $xmlh->addElement($users_element, "user");
++
++// add the user name
++$xmlh->setAttribute($user_element, "name", $_POST["name"]);
++
++// save the XML file
++$xmlh->saveFile();
++
++// set the name to the cookie
++setcookie("name", $_POST["name"]);
++
++// Cookie done, redirect to client.php (to avoid reloading of page from the client)
++header("Location: client.php");
++?>
+Index: Assigment3 chatroom PHP project/message.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/message.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/message.php	(date 1515068675000)
+@@ -0,0 +1,160 @@
++<?php
++
++// get the name from cookie
++$name = "";
++if (isset($_COOKIE["name"])) {
++    $name = $_COOKIE["name"];
++}
++
++print "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
++
++?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Message Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++        <script type="text/javascript" src="jquery.js"></script>
++        <script language="javascript" type="text/javascript">
++        //<![CDATA[
++        var loadTimer = null;
++        var request;
++        var datasize;
++        var lastMsgID;
++
++        function load() {
++            var username = document.getElementById("username");
++            if (username.value == "") {
++                loadTimer = setTimeout("load()", 100);
++                return;
++            }
++
++            loadTimer = null;
++            datasize = 0;
++            lastMsgID = 0;
++
++
++            
++            var node = document.getElementById("chatroom");
++            node.style.setProperty("visibility", "visible", null);
++
++            getUpdate();
++        }
++
++        function unload() {
++            var username = document.getElementById("username");
++            if (username.value != "") {
++                //request = new ActiveXObject("Microsoft.XMLHTTP");
++                request =new XMLHttpRequest();
++                request.open("POST", "logout.php", true);
++                request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
++                request.send(null);
++                username.value = "";
++            }
++            if (loadTimer != null) {
++                loadTimer = null;
++                clearTimeout("load()", 100);
++            }
++        }
++
++        function getUpdate() {
++            //request = new ActiveXObject("Microsoft.XMLHTTP");
++            request =new XMLHttpRequest();
++            request.onreadystatechange = stateChange;
++            request.open("POST", "server.php", true);
++            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
++            request.send("datasize=" + datasize);
++        }
++
++        function stateChange() {
++            if (request.readyState == 4 && request.status == 200 && request.responseText) {
++                var xmlDoc;
++                try {
++                    xmlDoc =new XMLHttpRequest();
++                    xmlDoc.loadXML(request.responseText);
++                } catch (e) {
++                    var parser = new DOMParser();
++                    xmlDoc = parser.parseFromString(request.responseText, "text/xml");
++                }
++                datasize = request.responseText.length;
++                updateChat(xmlDoc);
++                getUpdate();
++            }
++        }
++
++        function updateChat(xmlDoc) {
++
++            //point to the message nodes
++            var messages = xmlDoc.getElementsByTagName("message");
++
++            // create a string for the messages
++            /* Add your code here */
++            for(var i = lastMsgID; i < messages.length; i++) {
++                var msg = messages.item(i);
++                //Call function showMessage() to display message
++                showMessage(msg.getAttribute("name"), msg.firstChild.nodeValue,msg.getAttribute("color"));
++            }
++            //Record current message node(messages.length) so that you can start to
++            //process the messages from here next time
++            lastMsgID = messages.length;
++        }
++
++        function showMessage(nameStr, contentStr, color){
++            //display all starts with http/https://
++            var link = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#//=]{1,256}/;
++            //to display normal link
++            //var link = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#//=]{2,256}[a-z]{0,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
++            contentStr = contentStr.replace(link, function(match) {
++                return '<a href="' + match + '" target="_blank">' + match + '</a> ';
++            });
++
++            var chat = $('#chattext');
++            var row = '<tr>';
++            row += '<td>' + nameStr + '</td>';
++            row += '<td class="content" style="color:' + color + '">' + contentStr + '</td>';
++            row += '</tr>';
++            chat.append(row);
++        }
++        
++        //]]>
++        </script>
++        <style>
++            #chatroom-header { 
++                font-size: 30px;
++                font-weight: bold;
++                text-align: center;
++                color: red;
++            }
++            #chatroom {
++                min-height: 500px;
++            }
++            #chattext {
++                padding-left: 100px;
++                font-size: 20px;
++                font-weight: bold;
++            }
++            .content {
++                padding-left: 100px;
++            }
++            #chattext-wrap {
++                padding-bottom: 20px;
++                min-height: 500px;
++            }
++        </style>
++    </head>
++
++    <body style="text-align: left;" onload="load()" onunload="unload()" onbeforeunload="unload()">
++        <div id="chatroom" style="width:100%;">
++            <div id="chattext-wrap" style="100%; background:white; border:2px red solid;">
++                <h3 id="chatroom-header">Chatroom</h3>
++                <table id="chattext"></table>
++            </div>
++        </div>
++
++        <form action="">
++            <input type="hidden" value="<?php print $name; ?>" id="username" />
++            <input type="hidden" value="#000000" id="color" />
++        </form>
++
++    </body>
++</html>
+\ No newline at end of file
+Index: Assigment3 chatroom PHP project/logout.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/logout.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/logout.php	(date 1515068675000)
+@@ -0,0 +1,42 @@
++<?php 
++
++require_once('xmlHandler.php');
++
++if (!isset($_COOKIE["name"])) {
++    header("Location: error.html");
++    exit;
++}
++
++
++
++
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++if (!$xmlh->fileExist()) {
++    header("Location: error.html");
++    exit;
++}
++//clear
++$xmlh->openFile();
++$users_element = $xmlh->getElement("users");
++$messages_element = $xmlh->getElement("messages");
++while ($xmlh->getElement("user")){
++$xmlh->removeElement($users_element, $xmlh->getElement("user"));
++}
++while ($xmlh->getElement("message")){
++$xmlh->removeElement($messages_element, $xmlh->getElement("message"));
++}
++// save the XML file
++$xmlh->saveFile();
++
++// ??unfinished
++$name="";
++setcookie("name","");
++echo "<script>
++	window.parent.frames['message'].document.getElementById('username').setAttribute('value','');
++	window.parent.location.reload();
++	</script>";
++	
++
++
++?>
+Index: Assigment3 chatroom PHP project/login.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/login.html	(date 1515068675000)
++++ Assigment3 chatroom PHP project/login.html	(date 1515068675000)
+@@ -0,0 +1,53 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Login Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++        <script type="text/javascript">
++        //<![CDATA[
++        function clearMessage() {
++            try {
++                var name = window.parent.frames["message"].document.getElementById("username");
++                if (name != "") {
++                    window.parent.frames["message"].location.reload();
++                }
++            } catch (e) { }
++        }
++
++        //username input checking
++       function checkInput() {
++            //username cannot be empty
++            var input_field=document.getElementById("name");
++        if(!input_field.value){
++            alert('please enter a name');
++            return false;
++        }
++
++        //username cannot contain illeagl character
++        var reg=new RegExp("\\W");
++
++        if(input_field.value.match(reg)){
++        alert('Invalid user name!\nPlease don\'t use space and the following character. \"\':;<>()[]{}!@#$%^&*-+=');
++        return false;
++        }
++        return true;
++
++        }
++        </script>
++    </head>
++
++    <body onload="clearMessage()">
++        <form method="post" action="login.php" onsubmit="javascript:checkInput()">
++            <table border="0" cellpadding="5" cellspacing="0">
++                <tr>
++                    <td >Please enter your user name:</td>
++                    <td><input class="text" name="name" id="name" type="text" size="20" maxlength="10" /></td>
++                </tr>
++                <tr align="center">
++                    <td colspan="2"><input class="button" type="submit" value="Go!" style="width: 150px" /></td>
++                </tr>
++            </table>
++        </form>
++    </body>
++</html>
+Index: Assigment3 chatroom PHP project/error.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/error.html	(date 1515068675000)
++++ Assigment3 chatroom PHP project/error.html	(date 1515068675000)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Error Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++    </head>
++    <body>
++        <p>Error!</p>
++        <p><a href="login.html">Go back to the login page</a></p>
++    </body>
++</html>
+Index: Assigment3 chatroom PHP project/client.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/client.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/client.php	(date 1515068675000)
+@@ -0,0 +1,79 @@
++<?php
++
++if (!isset($_COOKIE["name"])) {
++    header("Location: error.html");
++    return;
++}
++
++// get the name from cookie
++$name = $_COOKIE["name"];
++
++print "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
++
++?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Add Message Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++        <script type="text/javascript">
++        //<![CDATA[
++        function load() {
++            var name = "<?php print $name; ?>";
++            var msg_win=window.parent.frames["message"];
++            var username_field=msg_win.document.getElementById("username");
++            //.value??
++            if(msg_win==null||username_field==null){
++                setTimeout("load()",200);
++                return;
++                }
++            username_field.value=name;
++            document.getElementById("color").value=window.parent.frames["message"].document.getElementById("color").getAttribute("value");
++        setTimeout("document.getElementById('msg').focus()",100);
++        }
++         function select(color){
++            document.getElementById("color").value=color;
++            window.parent.frames["message"].document.getElementById("color").setAttribute("value",color);
++        }
++        //]]>
++        </script>
++    </head>
++
++    <body style="text-align: left" onload="load()">
++        <form action="add_message.php" method="post">
++            <table border="0" cellspacing="5" cellpadding="0">
++                <tr>
++                    <td colspan="2">What is your message?</td>
++                    
++                </tr>
++                <tr>
++                    <td colspan="2"><input class="text" type="text" name="message" id="msg" style= "width: 780px" /></td>
++                </tr>
++                <tr>
++                    <td ><input class="button" type="submit" value="Send Your Message" style="width: 200px" />
++                    </td>
++                    <td>
++                        choose your color:
++                        <button style="background-color: magenta;width:30px;height: 30px" onclick="select('magenta');return false; "/>
++                        <button style="background-color: blue;width:30px;height: 30px" onclick="select('blue');return false; "/>
++                        <button style="background-color: cyan;width:30px;height: 30px" onclick="select('cyan');return false; "/>
++                        <button style="background-color: green;width:30px;height: 30px" onclick="select('green');return false; "/>
++                        <button style="background-color: yellow;width:30px;height: 30px" onclick="select('yellow');return false; "/>
++                        <button style="background-color: red;width:30px;height: 30px" onclick="select('red');return false; "/>
++                        </td>
++                </tr>
++            </table>
++            <input type="hidden" id="color" name="color" />
++        </form>
++        
++        <!--logout button-->
++        <form action="logout.php" method="post" onsubmit="alert('Goodbye!');">
++        <table border="0" cellspacing="5" cellpadding="0">
++        <tr style="border-top:1px solid gray">
++            <td>
++            <input class="button" type="submit" value="Logout">
++            </td>
++        </form>
++
++    </body>
++</html>
+Index: Assigment3 chatroom PHP project/chatroom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/chatroom.xml	(date 1515068675000)
++++ Assigment3 chatroom PHP project/chatroom.xml	(date 1515068675000)
+@@ -0,0 +1,5 @@
++<?xml version="1.0"?>
++<chatroom>
++  <users/>
++  <messages/>
++</chatroom>
+Index: Assigment3 chatroom PHP project/chatroom.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/chatroom.html	(date 1515068675000)
++++ Assigment3 chatroom PHP project/chatroom.html	(date 1515068675000)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Chatroom</title>
++    </head>
++    <frameset rows="360,*">
++        <frame name="message" scrolling="yes" src="message.php" frameborder="0" noresize="noresize" id="message" />
++        <frame name="user" scrolling="yes" src="login.html" frameborder="0" noresize="noresize" id="user" />
++    </frameset>
++</html>
++
+Index: Assigment3 chatroom PHP project/add_message.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/add_message.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/add_message.php	(date 1515068675000)
+@@ -0,0 +1,47 @@
++<?php
++
++if (!isset($_COOKIE["name"])) {
++    header("Location: error.html");
++    return;
++}
++
++// get the name from cookie
++$name = $_COOKIE["name"];
++
++// get the message content
++$message = $_POST["message"];
++if (trim($message) == "") $message = "__EMPTY__";
++
++require_once('xmlHandler.php');
++
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++if (!$xmlh->fileExist()) {
++    header("Location: error.html");
++    exit;
++}
++
++// create the following DOM tree structure for a message
++// and add it to the chatroom XML file
++//
++// <message name="...">...</message>
++//
++
++/* Add your code here */
++
++$xmlh->openFile();
++// Get the 'messages' element as the current element
++$messages_element = $xmlh->getElement("messages");
++// Create a 'message' element for each message
++$message_element = $xmlh->addElement($messages_element, "message");
++// Add the name
++$xmlh->setAttribute($message_element, "name", $_COOKIE["name"]);
++//Add the color
++$xmlh->setAttribute($message_element, "color", $_POST["color"]);
++//$xmlh->addAttribute($message_element, "color" $color);???
++// Add the content of the message
++$xmlh->addText($message_element, $message);
++$xmlh->saveFile();
++header("Location: client.php");
++
++?>
+Index: COMP4021-PHP-Chatroom-master/xmlHandler.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/xmlHandler.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/xmlHandler.php	(date 1576853787000)
+@@ -0,0 +1,174 @@
++<?php
++
++/**
++*
++* XML file handler
++*
++* The class xmlHandler is written based on the DOM functions
++*
++*/
++
++class xmlHandler {
++
++	var $filename;		// the filename of the XML file
++	var $doc;			// the document of the XML file
++	var $root;			// the root element node of the document
++
++	/**
++	* constructor
++	*
++	* @param string $filename, filename of the XML file
++	*/
++	function xmlHandler($filename) {
++		$this->filename = $filename;
++		$this->root = null;
++		$this->doc = null;
++	}
++
++	/**
++	* check if the XML file exist
++	*
++	* @return	boolean
++	*/
++	function fileExist() {
++		return file_exists($this->filename);
++	}
++
++	/**
++	* open the XML file
++	*
++	*/
++	function openFile() {
++		$rp = realpath($this->filename);
++
++		if ($this->fileExist()) {
++
++			$this->doc = new DOMDocument();
++			$this->doc->load($rp);
++
++			// get the root element of the document
++			$this->getRootElement();
++		}
++		else {
++
++			$this->doc = new DOMDocument('1.0', 'iso-8859-1');
++
++		}
++	}
++
++	/**
++	* save the XML file
++	*
++	*/
++	function saveFile() {
++		$rp = realpath($this->filename);
++		$this->doc->save($rp) ;
++	}
++
++	/**
++	* dump the XML tree into a string
++	*
++	* @return string
++	*/
++	function dumpToString() {
++		return $this->doc->saveXML();
++	}
++
++	/**
++	* add a root element node to the document
++	*
++	* @param string $element_name, element name
++	* @return DomNode $root
++	*/
++	function addRootElement($element_name) {
++
++		$this->root = $this->doc->createElement($element_name);
++		$this->doc->appendChild($this->root);
++		return $this->root;
++	}
++
++	/**
++	* get the root element node from the document
++	*
++	* @return DomNode $root
++	*/
++	function getRootElement() {
++		return $this->root;
++	}
++
++	/**
++	* add an element node to an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $child_name, the name of the to be added
++	*/
++	function addElement($element, $child_name) {
++		$child = $this->doc->createElement($child_name);
++		$element->appendChild($child);
++		return $child;
++	}
++
++	/**
++	* add a text node to an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $child_text, the text of the element's text node
++	*/
++	function addText($element, $child_text) {
++		$child_text_node = new DOMText($child_text);
++		$element->appendChild($child_text_node);
++	}
++
++	/**
++	* get an element node from the document
++	*
++	* @param string $element_name, the name of the element to be searched in the document
++	* @param integer $index, the index of the element (there may be lots of element with the same name)
++	* @return DomNode
++	*/
++	function getElement($element_name, $index=0) {
++		$node_array = $this->doc->documentElement->getElementsByTagName($element_name);
++		return $node_array->item($index);
++	}
++
++	/**
++	* get the chlid nodes of an element node from the document
++	*
++	* @param string $element_name, the name of the element to be searched in the document
++	* @param integer $index, the index of the element (there may be lots of element with the same name)
++	* @return array, all children of the node
++	*/
++	function getChildNodes($element_name, $index=0) {
++		$node_array = $this->doc->documentElement->getElementsByTagName($element_name);
++		return $node_array;
++	}
++
++	/**
++	* set an attribute of an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $attribute_name, the name of the attribute
++	* @param string $value, the value of the attribute
++	*/
++	function setAttribute($element, $attribute_name, $value) {
++		$element->setAttribute($attribute_name, $value);
++	}
++
++	/**
++	* get an attribute of an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $attribute_name, the name of the attribute
++	* @return string, the value of the attribute
++	*/
++	function getAttribute($element, $attribute_name) {
++		return $element->getAttribute($attribute_name);
++	}
++	
++	function removeElement($element, $child) {
++		$element->removeChild($child);
++	}
++
++}
++
++?>
+\ No newline at end of file
+Index: COMP4021-PHP-Chatroom-master/userlist.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/userlist.html	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/userlist.html	(date 1576853787000)
+@@ -0,0 +1,65 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++	<meta charset="UTF-8">
++	<title>Online User List</title>
++	<link rel="stylesheet" type="text/css" href="style.css" />
++    <link rel="stylesheet" type="text/css" href="userlist.css" />
++	<script>
++		var loadTimer = null;
++        var request;
++        var datasize;
++        var lastMsgID;
++
++        function load() {
++            loadTimer = null;
++            datasize = 0;
++            getUpdate();
++        }
++
++        function getUpdate() {
++            //request = new ActiveXObject("Microsoft.XMLHTTP");
++            request =new XMLHttpRequest();
++            request.onreadystatechange = stateChange;
++            request.open("POST", "server.php", true);
++            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
++            request.send("datasize=" + datasize);
++        }
++
++        function stateChange() {
++            if (request.readyState == 4 && request.status == 200 && request.responseText) {
++                var xmlDoc;
++                var parser = new DOMParser();
++                xmlDoc = parser.parseFromString(request.responseText, "text/xml");
++                datasize = request.responseText.length;
++                updateChat(xmlDoc);
++                getUpdate();
++            }
++        }
++
++        function updateChat(xmlDoc) {
++
++            var users = xmlDoc.getElementsByTagName("user");
++			document.getElementById('userlist').innerHTML = "";
++
++        	for (var i = 0; i < users.length; i++) {
++                filepath = users[i].getAttribute('filepath');
++                nameStr = users[i].getAttribute('name');
++                document.getElementById('userlist').innerHTML = document.getElementById('userlist').innerHTML + '<tr>' + '<td><img  class="picture" src="' + filepath  + '"/></td><td>' + nameStr + '</td>' + '</tr>';
++        	}
++        }
++
++	</script>
++</head>
++<body onload="load()">
++	<table id="userTable">
++		<thead cellspacing="0" cellpadding="0" class="t-head">
++			<tr>
++				<th><strong></strong></th>
++				<th><strong>User</strong></th>
++			</tr>
++		</thead>
++		<tbody id="userlist"></tbody>
++	</table>
++</body>
++</html>
+Index: COMP4021-PHP-Chatroom-master/userlist.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/userlist.css	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/userlist.css	(date 1576853787000)
+@@ -0,0 +1,7 @@
++th {
++    padding: 10px;
++}
++
++tr:not(:first-child) td {
++     border-top:1pt solid black;
++}
+\ No newline at end of file
+Index: COMP4021-PHP-Chatroom-master/style.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/style.css	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/style.css	(date 1576853787000)
+@@ -0,0 +1,43 @@
++body {
++    font-family: Trebuchet MS, sans-serif;
++    font-weight: bold;
++    margin: 0px;
++    padding: 5px;
++    background: #e0e0ff;
++    width: 800px;
++    text-align: center;
++}
++form {
++    margin: 0px;
++    padding: 0px;
++}
++input.text {
++    font-family: Trebuchet MS, sans-serif;
++    font-size: 12pt;
++    border: 1px solid black;
++    background: white;
++}
++input.button {
++    font-family: Trebuchet MS, sans-serif;
++    font-size: 10pt;
++    border: 1px solid black;
++    border-top: 1px solid gray;
++    border-left: 1px solid gray;
++    background: lightgray;
++}
++
++.t-head {
++    background: white;
++}
++
++.picture {
++    max-width: 100px;
++    max-height: 100px;
++}
++
++#userTable {
++    border: 1px solid #000;
++    width: 50%;
++    border-spacing: 0px;
++}
++
+Index: COMP4021-PHP-Chatroom-master/server.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/server.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/server.php	(date 1576853787000)
+@@ -0,0 +1,66 @@
++<?php
++
++require_once('xmlHandler.php');
++
++$datasize = $_POST["datasize"];
++
++// set the execution time limit for this php session to 60 seconds (default is in php.ini)
++set_time_limit(60);
++        
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++
++// check if the chatroom XML data file exists
++if (!$xmlh->fileExist()) {
++    // create new XML file
++    $xmlh->openFile();
++
++    // create a 'chatroom' element, as root element
++    $root = $xmlh->addRootElement("chatroom");
++                                
++    // create a 'messages' element for the set of messages
++    $xmlh->addElement($root, "users");
++    $xmlh->addElement($root, "messages");
++                                
++    // save the XML file
++    $xmlh->saveFile();
++}
++
++$start = gettimeofday();
++
++while (1) {
++    // if the file size of chatroom.xml is changed, that means new message has been added
++    if ($xmlh->fileExist()) {
++        // if data size is changed,
++        // stop running this while loop to send messages to user
++        if ($_POST["datasize"] != filesize("chatroom.xml")) {
++            break;
++        }
++    }
++
++    // clear the internal cache of file system functions from php
++    clearstatcache();
++
++    // we are not going to run the loop for more than 30 seconds
++    $time = gettimeofday();
++    if ($time["sec"] - $start["sec"] > 30) break;
++        
++    // stop running the while loop for a second
++    sleep(1);
++}
++
++$output = "";
++
++// output the content of chatroom.xml as XML message
++if ($xmlh->fileExist()) {
++    // open the existing XML file
++    $xmlh->openFile();
++        
++    // get all the elements in the XML file
++    $output = $xmlh->dumpToString();
++}
++
++// print the XML output	
++print $output;
++
++?>
+Index: COMP4021-PHP-Chatroom-master/readme.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/readme.txt	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/readme.txt	(date 1576853787000)
+@@ -0,0 +1,1 @@
++Please do not delete the images folder while testing because it's where I store the pictures for the user list. Program was ran in the www subfolder of wampserver.
+\ No newline at end of file
+Index: COMP4021-PHP-Chatroom-master/message.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/message.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/message.php	(date 1576853787000)
+@@ -0,0 +1,146 @@
++<?php
++
++// get the name from cookie
++// $name = "";
++// if (isset($_COOKIE["name"])) {
++//     $name = $_COOKIE["name"];
++// }
++
++print "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
++
++?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Message Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++        <script language="javascript" type="text/javascript">
++        var loadTimer = null;
++        var request;
++        var datasize;
++        var lastMsgID;
++        var prevMessageLen = 0;
++
++        function load() {
++            /*var username = document.getElementById("username");
++            if (username.value == "") {
++                loadTimer = setTimeout("load()", 100);
++                return;
++            }*/
++            
++            loadTimer = null;
++            datasize = 0;
++            lastMsgID = 0;
++            
++            var node = document.getElementById("chatroom");
++            node.style.setProperty("visibility", "visible", null);
++
++            getUpdate();
++        }
++
++        function unload() {
++            var username = document.getElementById("username");
++            if (username.value != "") {
++                //request = new ActiveXObject("Microsoft.XMLHTTP");
++                request = new XMLHttpRequest();
++                request.open("POST", "logout.php", true);
++                request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
++                request.send(null);
++                username.value = "";
++            }
++            if (loadTimer != null) {
++                loadTimer = null;
++                clearTimeout("load()", 100);
++            }
++        }
++
++        function getUpdate() {
++            //request = new ActiveXObject("Microsoft.XMLHTTP");
++            request = new XMLHttpRequest();
++            request.onreadystatechange = stateChange;
++            request.open("POST", "server.php", true);
++            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
++            request.send("datasize=" + datasize);
++        }
++
++        function stateChange() {
++            if (request.readyState == 4 && request.status == 200 && request.responseText) {
++                var xmlDoc;
++                var parser = new DOMParser();
++                xmlDoc = parser.parseFromString(request.responseText, "text/xml");
++                datasize = request.responseText.length;
++                updateChat(xmlDoc);
++                getUpdate();
++            }
++        }
++
++        function updateChat(xmlDoc) {
++
++            //point to the message nodes
++            var messages = xmlDoc.getElementsByTagName("message");
++
++            // create a string for the messages
++            var i;
++            for (i = prevMessageLen; i < messages.length; ++i) {
++                var username = messages[i].getAttribute("name");
++                var color = messages[i].getAttribute("color");
++                showMessage(username, messages[i].textContent, color);
++            }
++            prevMessageLen = messages.length;
++        }
++
++        function showMessage(nameStr, contentStr, color) {
++               
++                var node = document.getElementById("chattext");
++                // Create the name text span
++                var nameNode = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
++
++                // Set the attributes and create the text
++                nameNode.setAttribute("x", 100);
++                nameNode.setAttribute("dy", 20);
++                nameNode.setAttribute("style", "fill:" + color);
++                nameNode.appendChild(document.createTextNode(nameStr));
++
++                // Add the name to the text node
++                node.appendChild(nameNode);
++
++                // Create the score text span
++                var conetentNode = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
++                var regex = /((https|http)?:\/\/[^\s]+)/g;
++
++                contentStr = contentStr.replace(regex, '<a text-decoration="underline" target="blank" href="$1">$1</a>');
++
++
++                // Set the attributes and create the text
++                conetentNode.setAttribute("x", 200);
++                conetentNode.setAttribute("style", "fill:" + color);
++                conetentNode.innerHTML = contentStr;
++
++                // Add the name to the text node
++                node.appendChild(conetentNode);
++        }
++
++        </script>
++    </head>
++
++    <body style="text-align: left" onload="load()" onunload="unload()">
++    <svg width="800px" height="2000px"
++     xmlns="http://www.w3.org/2000/svg"
++     xmlns:xhtml="http://www.w3.org/1999/xhtml"
++     xmlns:xlink="http://www.w3.org/1999/xlink"
++     xmlns:a="http://www.adobe.com/svg10-extensions" a:timeline="independent"
++     >
++
++        <g id="chatroom" style="visibility:hidden">                
++        <rect width="520" height="2000" style="fill:white;stroke:red;stroke-width:2"/>
++        <text x="260" y="40" style="fill:red;font-size:30px;font-weight:bold;text-anchor:middle">Chat Window</text> 
++        <text id="chattext" y="45" style="font-size: 20px;font-weight:bold"/>
++      </g>
++  </svg>
++  
++         <!-- <form action="">
++            <input type="hidden" value="<?php print $name; ?>" id="username" />
++        </form> -->
++
++    </body>
++</html>
+Index: COMP4021-PHP-Chatroom-master/logout.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/logout.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/logout.php	(date 1576853787000)
+@@ -0,0 +1,46 @@
++<?php 
++
++require_once('xmlHandler.php');
++
++if (!isset($_COOKIE["name"])) {
++    header("Location: error.html");
++    exit;
++}
++
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++if (!$xmlh->fileExist()) {
++    header("Location: error.html");
++    exit;
++}
++
++$name = $_COOKIE["name"];
++
++$xmlh->openFile();
++
++$users_element = $xmlh->getElement("users");
++
++$user_element = $xmlh->getChildNodes("user");
++
++if($user_element != null) {
++    // delete the current user from the users element
++    foreach ($user_element as $user) {
++        $username = $xmlh->getAttribute($user, "name");
++        if ($username == $name)
++        	//remove the user & pic if match
++            $file = $xmlh->getAttribute($user, "filepath");
++            unlink($file);
++
++            $xmlh->removeElement($users_element, $user);
++    }
++}
++
++$xmlh->saveFile();
++
++//user has no name
++setcookie("name", "");
++
++//redurect to login page
++header("Location: login.html");
++
++?>
+Index: COMP4021-PHP-Chatroom-master/login.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/login.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/login.php	(date 1576853787000)
+@@ -0,0 +1,63 @@
++<?php
++session_start();
++
++if (isset($_SESSION['name']) && !empty($_SESSION['name'])) {
++	header("Location: client.php");
++}
++
++
++if ($_SERVER['REQUEST_METHOD'] == 'POST') {
++
++    $username = $_POST['name'];
++
++    if (isset($_FILES['avatar'])) {
++        $extension = end(explode('.', $_FILES['avatar']['name']));
++
++        $filepath = 'images/' . $username . '.' .$extension;
++
++        if (!move_uploaded_file($_FILES['avatar']['tmp_name'], $filepath)) {
++            header("Location: fileerror.html");
++        }
++
++    }
++    else {
++        header("Location: fileerror.html");
++        exit;
++    }
++
++    require_once('xmlHandler.php');
++
++    // create the chatroom xml file handler
++    $xmlh = new xmlHandler("chatroom.xml");
++    if (!$xmlh->fileExist()) {
++        header("Location: error.html");
++        exit;
++    }
++
++    // open the existing XML file
++    $xmlh->openFile();
++
++    // get the 'users' element
++    $users_element = $xmlh->getElement("users");
++
++    // create a 'user' element
++    $user_element = $xmlh->addElement($users_element, "user");
++
++    // add the user name
++    $xmlh->setAttribute($user_element, "name", $_POST["name"]);
++
++
++    $xmlh->setAttribute($user_element, "filepath", $filepath);
++
++    // save the XML file
++    $xmlh->saveFile();
++
++    // set the name to the cookie
++    setcookie("name", $_POST["name"]);
++
++    $_SESSION['name'] = $_POST["name"];
++
++
++    header("Location: client.php");
++}
++?>
+Index: COMP4021-PHP-Chatroom-master/login.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/login.html	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/login.html	(date 1576853787000)
+@@ -0,0 +1,76 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Login Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++        <script type="text/javascript">
++        function clearMessage() {
++            try {
++                var name = window.parent.frames["message"].document.getElementById("username");
++                if (name != "") {
++                    window.parent.frames["message"].location.reload();
++                }
++            } catch (e) { }
++        }
++        
++        //username input checking
++       function checkInput(e) {
++            // username cannot be empty
++            var nameInput = document.getElementById("name");
++            var nameVal = nameInput.value.trim();
++            if (nameVal == "") {
++                alert("User name cannot be empty!");
++                e.preventDefault();
++                return false;
++            }
++
++            // username cannot contain illeagl character
++            var illChars = "\"\':;<>()[]{}!@#$%^&*-+=";
++            for (var i = 0; i < illChars.length; i++) {
++                if (nameVal.includes(illChars.charAt(i))) {   
++                    alert("Invalid user name!");
++                    e.preventDefault();
++                return false;
++                }
++            }
++
++            //check if file selected
++           var upload = document.getElementById("file").value;
++           if (upload == "") {
++                alert("No file selected!");
++                e.preventDefault();
++                return false;
++           }
++
++           // user has to upload picture format only
++           var extension = upload.substring(upload.lastIndexOf('.') + 1);
++           if (!(extension == "png" || extension == "jpg" || extension == "svg")) {
++                alert("Format is not acceptable!");
++                e.preventDefault();
++                return false;
++           }
++           return true;
++        }
++        
++        </script>
++    </head>
++
++    <body onload="clearMessage()">
++        <form enctype="multipart/form-data" method="post" action="login.php" onsubmit="javascript:checkInput(event)">
++            <table border="0" cellpadding="5" cellspacing="0">
++                <tr>
++                    <td>Please enter your user name:</td>
++                    <td><input class="text" name="name" id="name" type="text" size="20" maxlength="10" /></td>
++                </tr>
++                <tr>
++                    <td>Please choose your picture: (acceptable formats: JPG, PNG, & SVG)</td>
++                    <td><input type="file" name="avatar" id="file"></td>
++                </tr>
++                <tr align="center">
++                    <td colspan="2"><input class="button" type="submit" value="Go!" style="width: 150px" /></td>
++                </tr>
++            </table>
++        </form>
++    </body>
++</html>
+Index: COMP4021-PHP-Chatroom-master/fileerror.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/fileerror.html	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/fileerror.html	(date 1576853787000)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>File Error Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++    </head>
++    <body>
++        <p>File Error!</p>
++        <p><a href="chatroom.html">Go back to the login page</a></p>
++    </body>
++</html>
+Index: COMP4021-PHP-Chatroom-master/error.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/error.html	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/error.html	(date 1576853787000)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Error Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++    </head>
++    <body>
++        <p>Error!</p>
++        <p><a href="chatroom.html">Go back to the login page</a></p>
++    </body>
++</html>
+Index: COMP4021-PHP-Chatroom-master/client.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/client.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/client.php	(date 1576853787000)
+@@ -0,0 +1,92 @@
++<?php
++
++if (!isset($_COOKIE["name"])) {
++    header("Location: error.html");
++    return;
++}
++
++// get the name from cookie
++$name = $_COOKIE["name"];
++
++print "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
++
++?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Add Message Page</title>
++        <link rel="stylesheet" type="text/css" href="style.css" />
++        <style>
++            .div-color {
++                position: absolute;
++                width: 50px;
++                height: 50px;
++            }
++        </style>
++        <script type="text/javascript">
++        function load() {
++            var name = "<?php print $name; ?>";
++
++            setTimeout("document.getElementById('msg').focus()", 100);
++        }
++
++        function userlist(url) {
++            newwindow=window.open(url,'name','height=600,width=800');
++            if (window.focus) {
++                newwindow.focus()
++            }
++            return false;
++        }
++
++        function select(color) {
++            if (confirm('Are you sure to change your message color to ' + color + '?')) {
++                document.getElementById("color").value = color;
++            }
++        }
++        </script>
++    </head>
++
++    <body style="text-align: left" onload="load()">
++        <form action="add_message.php" method="post">
++            <table border="0" cellspacing="5" cellpadding="0">
++                <tr>
++                    <td>What is your message?</td>
++                </tr>
++                <tr>
++                    <td><input class="text" type="text" name="message" id="msg" style= "width: 780px" /></td>
++                </tr>
++                <tr>
++                    <td>
++                        <input class="button" type="submit" value="Send Your Message" style="width: 200px" />
++                        
++                        <div style="position:relative; height: 70px;">
++                            Choose your color:
++                            <div class="div-color" style="background-color:black;left:0px" onclick="select('black')"></div>
++                            <div class="div-color" style="background-color:yellow;left:50px" onclick="select('yellow')"></div>
++                            <div class="div-color" style="background-color:green;left:100px" onclick="select('green')"></div>
++                            <div class="div-color" style="background-color:cyan;left:150px" onclick="select('cyan')"></div>
++                            <div class="div-color" style="background-color:blue;left:200px" onclick="select('blue')"></div>
++                            <div class="div-color" style="background-color:magenta;left:250px" onclick="select('magenta')"></div>
++                        </div>
++                        <input type="hidden" name="color" id="color" value="black" />
++                    </td>
++                </tr>
++            </table>
++        </form>
++        
++        <!--logout & user list-->
++        <table border="0" cellspacing="5" cellpadding="0">
++            <tr>
++                <td>
++                    <form action="logout.php" method="post">
++                        <input class="button" type="submit" value="Click to Logout" style="position:relative; width: 200px;"/>
++                    </form>
++                </td>
++                <td>
++                    <button class="button" style="margin-left: 5px;width: 200px" onclick="userlist('userlist.html'); return false;">Online Users List</button>
++                </td>
++            </tr>
++        </table>
++
++    </body>
++</html>
+Index: COMP4021-PHP-Chatroom-master/chatroom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/chatroom.xml	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/chatroom.xml	(date 1576853787000)
+@@ -0,0 +1,5 @@
++<?xml version="1.0"?>
++<chatroom>
++  <users></users>
++  <messages><message name="html" color="black">this hthttps://www.google.com/ test</message><message name="html" color="cyan">homepage: https://www.ust.hk here</message><message name="Bill" color="blue">Please look at http://google.com now!</message></messages>
++</chatroom>
+Index: COMP4021-PHP-Chatroom-master/chatroom.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/chatroom.html	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/chatroom.html	(date 1576853787000)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++    <head>
++        <title>Chatroom</title>
++    </head>
++    <frameset rows="360,*">
++        <frame name="message" scrolling="yes" src="message.php" frameborder="0" noresize="noresize" id="message" />
++        <frame name="user" scrolling="yes" src="login.html" frameborder="0" noresize="noresize" id="user" />
++    </frameset>
++</html>
++
+Index: COMP4021-PHP-Chatroom-master/add_message.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- COMP4021-PHP-Chatroom-master/add_message.php	(date 1576853787000)
++++ COMP4021-PHP-Chatroom-master/add_message.php	(date 1576853787000)
+@@ -0,0 +1,46 @@
++<?php
++
++if (!isset($_COOKIE["name"])) {
++    header("Location: error.html");
++    return;
++}
++
++// get the name from cookie
++$name = $_COOKIE["name"];
++
++// get the message content
++$message = $_POST["message"];
++if (trim($message) == "") $message = "__EMPTY__";
++
++$color = $_POST["color"];
++
++require_once('xmlHandler.php');
++
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++if (!$xmlh->fileExist()) {
++    header("Location: error.html");
++    exit;
++}
++
++// create the following DOM tree structure for a message
++// and add it to the chatroom XML file
++//
++// <message name="...">...</message>
++//
++
++$xmlh->openFile();
++// Get the 'messages' element as the current element
++$messages_element = $xmlh->getElement("messages");
++// Create a 'message' element for each message
++$message_element = $xmlh->addElement($messages_element, "message");
++// Add the name
++$xmlh->setAttribute($message_element, "name", $name);
++$xmlh->setAttribute($message_element, "color", $color);
++// Add the content of the message
++$xmlh->addText($message_element, $message);
++$xmlh->saveFile();
++
++header("Location: client.php");
++
++?>
+Index: Assigment3 chatroom PHP project/xmlHandler.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/xmlHandler.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/xmlHandler.php	(date 1515068675000)
+@@ -0,0 +1,174 @@
++<?php
++
++/**
++*
++* XML file handler
++*
++* The class xmlHandler is written based on the DOM functions
++*
++*/
++
++class xmlHandler {
++
++	var $filename;		// the filename of the XML file
++	var $doc;			// the document of the XML file
++	var $root;			// the root element node of the document
++
++	/**
++	* constructor
++	*
++	* @param string $filename, filename of the XML file
++	*/
++	function xmlHandler($filename) {
++		$this->filename = $filename;
++		$this->root = null;
++		$this->doc = null;
++	}
++
++	/**
++	* check if the XML file exist
++	*
++	* @return	boolean
++	*/
++	function fileExist() {
++		return file_exists($this->filename);
++	}
++
++	/**
++	* open the XML file
++	*
++	*/
++	function openFile() {
++		$rp = realpath($this->filename);
++
++		if ($this->fileExist()) {
++
++			$this->doc = new DOMDocument();
++			$this->doc->load($rp);
++
++			// get the root element of the document
++			$this->getRootElement();
++		}
++		else {
++
++			$this->doc = new DOMDocument('1.0', 'iso-8859-1');
++
++		}
++	}
++
++	/**
++	* save the XML file
++	*
++	*/
++	function saveFile() {
++		$rp = realpath($this->filename);
++		$this->doc->save($rp) ;
++	}
++
++	/**
++	* dump the XML tree into a string
++	*
++	* @return string
++	*/
++	function dumpToString() {
++		return $this->doc->saveXML();
++	}
++
++	/**
++	* add a root element node to the document
++	*
++	* @param string $element_name, element name
++	* @return DomNode $root
++	*/
++	function addRootElement($element_name) {
++
++		$this->root = $this->doc->createElement($element_name);
++		$this->doc->appendChild($this->root);
++		return $this->root;
++	}
++
++	/**
++	* get the root element node from the document
++	*
++	* @return DomNode $root
++	*/
++	function getRootElement() {
++		return $this->root;
++	}
++
++	/**
++	* add an element node to an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $child_name, the name of the to be added
++	*/
++	function addElement($element, $child_name) {
++		$child = $this->doc->createElement($child_name);
++		$element->appendChild($child);
++		return $child;
++	}
++
++	/**
++	* add a text node to an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $child_text, the text of the element's text node
++	*/
++	function addText($element, $child_text) {
++		$child_text_node = new DOMText($child_text);
++		$element->appendChild($child_text_node);
++	}
++
++	/**
++	* get an element node from the document
++	*
++	* @param string $element_name, the name of the element to be searched in the document
++	* @param integer $index, the index of the element (there may be lots of element with the same name)
++	* @return DomNode
++	*/
++	function getElement($element_name, $index=0) {
++		$node_array = $this->doc->documentElement->getElementsByTagName($element_name);
++		return $node_array->item($index);
++	}
++
++	/**
++	* get the chlid nodes of an element node from the document
++	*
++	* @param string $element_name, the name of the element to be searched in the document
++	* @param integer $index, the index of the element (there may be lots of element with the same name)
++	* @return array, all children of the node
++	*/
++	function getChildNodes($element_name, $index=0) {
++		$node_array = $this->doc->documentElement->getElementsByTagName($element_name);
++		return $node_array;
++	}
++
++	/**
++	* set an attribute of an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $attribute_name, the name of the attribute
++	* @param string $value, the value of the attribute
++	*/
++	function setAttribute($element, $attribute_name, $value) {
++		$element->setAttribute($attribute_name, $value);
++	}
++
++	/**
++	* get an attribute of an element node
++	*
++	* @param DomNode $element, the element node
++	* @param string $attribute_name, the name of the attribute
++	* @return string, the value of the attribute
++	*/
++	function getAttribute($element, $attribute_name) {
++		return $element->getAttribute($attribute_name);
++	}
++	
++	function removeElement($element, $child) {
++		$element->removeChild($child);
++	}
++
++}
++
++?>
+\ No newline at end of file
+Index: Assigment3 chatroom PHP project/style.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/style.css	(date 1515068675000)
++++ Assigment3 chatroom PHP project/style.css	(date 1515068675000)
+@@ -0,0 +1,27 @@
++body {
++    font-family: Trebuchet MS, sans-serif;
++    font-weight: bold;
++    margin: 0px;
++    padding: 5px;
++    background: #e0e0ff;
++    width: 800px;
++    text-align: center;
++}
++form {
++    margin: 0px;
++    padding: 0px;
++}
++input.text {
++    font-family: Trebuchet MS, sans-serif;
++    font-size: 12pt;
++    border: 1px solid black;
++    background: white;
++}
++input.button {
++    font-family: Trebuchet MS, sans-serif;
++    font-size: 10pt;
++    border: 1px solid black;
++    border-top: 1px solid gray;
++    border-left: 1px solid gray;
++    background: lightgray;
++}
+Index: Assigment3 chatroom PHP project/server.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/server.php	(date 1515068675000)
++++ Assigment3 chatroom PHP project/server.php	(date 1515068675000)
+@@ -0,0 +1,66 @@
++<?php
++
++require_once('xmlHandler.php');
++
++$datasize = $_POST["datasize"];
++
++// set the execution time limit for this php session to 60 seconds (default is in php.ini)
++set_time_limit(60);
++        
++// create the chatroom xml file handler
++$xmlh = new xmlHandler("chatroom.xml");
++
++// check if the chatroom XML data file exists
++if (!$xmlh->fileExist()) {
++    // create new XML file
++    $xmlh->openFile();
++
++    // create a 'chatroom' element, as root element
++    $root = $xmlh->addRootElement("chatroom");
++                                
++    // create a 'messages' element for the set of messages
++    $xmlh->addElement($root, "users");
++    $xmlh->addElement($root, "messages");
++                                
++    // save the XML file
++    $xmlh->saveFile();
++}
++
++$start = gettimeofday();
++
++while (1) {
++    // if the file size of chatroom.xml is changed, that means new message has been added
++    if ($xmlh->fileExist()) {
++        // if data size is changed,
++        // stop running this while loop to send messages to user
++        if ($_POST["datasize"] != filesize("chatroom.xml")) {
++            break;
++        }
++    }
++
++    // clear the internal cache of file system functions from php
++    clearstatcache();
++
++    // we are not going to run the loop for more than 30 seconds
++    $time = gettimeofday();
++    if ($time["sec"] - $start["sec"] > 30) break;
++        
++    // stop running the while loop for a second
++    sleep(1);
++}
++
++$output = "";
++
++// output the content of chatroom.xml as XML message
++if ($xmlh->fileExist()) {
++    // open the existing XML file
++    $xmlh->openFile();
++        
++    // get all the elements in the XML file
++    $output = $xmlh->dumpToString();
++}
++
++// print the XML output	
++print $output;
++
++?>
+Index: Assigment3 chatroom PHP project/readme.txt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- Assigment3 chatroom PHP project/readme.txt	(date 1515068675000)
++++ Assigment3 chatroom PHP project/readme.txt	(date 1515068675000)
+@@ -0,0 +1,13 @@
++browser chrome
++
++1.All text starts http
++all text which starts with http://or https:// will be hyperlink
++eg. http://l but not http:// itself
++
++2. normal http
++for the normal common link http://
++using the following code by
++uncomment line 106	in message.php
++comment line 104	in message.php
++
++var link = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#//=]{2,256}[a-z]{0,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
