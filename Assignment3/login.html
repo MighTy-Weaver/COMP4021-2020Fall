@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script type="text/javascript">
+        function clearMessage() {
+            try {
+                var name = window.parent.frames["message"].document.getElementById("username");
+                if (name != "") {
+                    window.parent.frames["message"].location.reload();
+                }
+            } catch (e) {
+            }
+        }
+
+        //username input checking
+        function checkInput(e) {
+            var name = document.getElementById("name").value.trim();
+            if (name == "") {
+                alert("Please enter a name!\nUser name cannot be empty!");
+                e.preventDefault();
+                return false;
+            }
+            var illegal_char = "\"\':;<>()[]{}!@#$%^&*-+= ";
+            for (var i = 0; i < illegal_char.length; i++) {
+                if (name.includes(illegal_char.charAt(i))) {
+                    alert("Invalid user name!\nPlease don't use space and the following characters.\n\"\':;<>()[]{}!@#$%^&*-+=");
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            var file = document.getElementById("file").value;
+            if (file == "") {
+                alert("Please choose a picture as your avatar!");
+                e.preventDefault();
+                return false;
+            }
+            var file_type = file.substring(file.lastIndexOf('.') + 1);
+            if (file_type != "png" && file_type != "jpg") {
+                alert("Only jpg and png image can be uploaded!");
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+
+<body onload="clearMessage()">
+<form enctype="multipart/form-data" method="post" action="login.php" onsubmit="javascript:checkInput(event)">
+    <table border="0" cellpadding="5" cellspacing="0">
+        <tr>
+            <td>Please enter your user name:</td>
+            <td><input class="text" name="name" id="name" type="text" size="20" maxlength="10"/></td>
+        </tr>
+        <tr>
+            <td>Please upload a picture (only .jpg and .png are allowed):</td>
+            <td><input type="file" name="avatar" id="file" accept=".jpg,.png"></td>
+        </tr>
+        <tr align="center">
+            <td colspan="2"><input class="button" type="submit" value="Go!" style="width: 150px"/></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

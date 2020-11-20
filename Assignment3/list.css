@@ -1,0 +1,7 @@
+th {
+    padding: 10px;
+}
+
+tr:not(:first-child) td {
+    border-top:1pt solid black;
+}

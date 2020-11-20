@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Online User List</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="list.css" />
+	<script>
+		var loadTimer = null;
+        var request;
+        var datasize;
+		function load() {
+			loadTimer = null;
+            datasize = 0;
+            getUpdate();
+        }
+
+        function getUpdate() {
+            request =new XMLHttpRequest();
+            request.onreadystatechange = stateChange;
+            request.open("POST", "server.php", true);
+            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            request.send("datasize=" + datasize);
+        }
+
+        function stateChange() {
+            if (request.readyState == 4 && request.status == 200 && request.responseText) {
+                var xmlDoc;
+                var parser = new DOMParser();
+                xmlDoc = parser.parseFromString(request.responseText, "text/xml");
+                datasize = request.responseText.length;
+                updateChat(xmlDoc);
+                getUpdate();
+            }
+        }
+
+        function updateChat(xmlDoc) {
+            var users = xmlDoc.getElementsByTagName("user");
+			document.getElementById('userlist').innerHTML = "";
+			for (var i = 0; i < users.length; i++) {
+				var file_path = users[i].getAttribute('filepath');
+				var name = users[i].getAttribute('name');
+				document.getElementById('userlist').innerHTML = document.getElementById('userlist').innerHTML + '<tr>' + '<td><img  class="picture" src="' + file_path + '"/></td><td>' + name + '</td>' + '</tr>';
+			}
+        }
+
+	</script>
+</head>
+<body onload="load()">
+	<table id="userTable">
+		<thead cellspacing="0" cellpadding="0" class="t-head">
+			<tr>
+				<th><strong></strong></th>
+				<th><strong>User List</strong></th>
+			</tr>
+		</thead>
+		<tbody id="userlist"></tbody>
+	</table>
+</body>
+</html>
