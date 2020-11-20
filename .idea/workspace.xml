@@ -20,6 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7dd2158f-ca64-4a9d-85a6-bd2daf9f9618" name="Default Changelist" comment="rename folders">
+      <change afterPath="$PROJECT_DIR$/Assignment3/a3_2017f.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,7 +73,7 @@
       <workItem from="1605694471525" duration="1408000" />
       <workItem from="1605714537776" duration="598000" />
       <workItem from="1605759603437" duration="1761000" />
-      <workItem from="1605856920970" duration="23000" />
+      <workItem from="1605856920970" duration="1114000" />
     </task>
     <task id="LOCAL-00001" summary="assignment1 and 2 updated">
       <created>1605527802571</created>
@@ -179,7 +180,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605760504446</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="assignment 3 upload">
+      <created>1605856961021</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1605856961021</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,7 +220,8 @@
     <MESSAGE value="fix the bug of infinite shooting" />
     <MESSAGE value="personal information deleted" />
     <MESSAGE value="delete assignment 3 and re-route it" />
-    <option name="LAST_COMMIT_MESSAGE" value="delete assignment 3 and re-route it" />
+    <MESSAGE value="assignment 3 upload" />
+    <option name="LAST_COMMIT_MESSAGE" value="assignment 3 upload" />
   </component>
   <component name="WindowStateProjectService">
     <state x="492" y="213" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1605529558901">
@@ -223,11 +232,11 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="549" y="153" key="FileChooserDialogImpl/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1605527832262" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1605760506018">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1605856962616">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824/-1920.0.1920.1040@0.0.1536.824" timestamp="1605699975862" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1605760506018" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1605856962616" />
     <state x="573" y="325" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605529105641">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
