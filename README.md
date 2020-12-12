@@ -11,8 +11,7 @@ Description is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/ma
 ## Assignment 2: SVG Game
 
 Description
-is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignment2/COMP4021_SVG_Proj_detail_2019F.pdf)
-.
+is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignment2/COMP4021_SVG_Proj_detail_2019F.pdf).
 
 > Final Mark: **/100**
 

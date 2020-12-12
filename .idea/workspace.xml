@@ -21,7 +21,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7dd2158f-ca64-4a9d-85a6-bd2daf9f9618" name="Default Changelist" comment="rename folders">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assignment3/message.php" beforeDir="false" afterPath="$PROJECT_DIR$/Assignment3/message.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,6 +46,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
@@ -80,7 +80,8 @@
       <workItem from="1606979395807" duration="740000" />
       <workItem from="1607181435933" duration="196000" />
       <workItem from="1607745391678" duration="344000" />
-      <workItem from="1607745886946" duration="456000" />
+      <workItem from="1607745886946" duration="648000" />
+      <workItem from="1607746581488" duration="10000" />
     </task>
     <task id="LOCAL-00001" summary="assignment1 and 2 updated">
       <created>1605527802571</created>
@@ -201,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605866125712</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Final update">
+      <created>1607746462489</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1607746462490</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -236,6 +244,7 @@
     <MESSAGE value="delete assignment 3 and re-route it" />
     <MESSAGE value="assignment 3 upload" />
     <MESSAGE value="assignment 3 discription" />
-    <option name="LAST_COMMIT_MESSAGE" value="assignment 3 discription" />
+    <MESSAGE value="Final update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final update" />
   </component>
 </project>
