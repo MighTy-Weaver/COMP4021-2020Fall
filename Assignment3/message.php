@@ -74,7 +74,7 @@ print "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
             message_length = messages.length;
         }
 
-        function showMessage(nameStr, contentStr, color = "red") {
+        function showMessage(nameStr, contentStr, color = "black") {
 
             var node = document.getElementById("chattext");
             // Create the name text span
@@ -91,14 +91,13 @@ print "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
             // Create the score text span
             var conetentNode = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-            var RE = /((https|http)?:\/\/[^\s]+)/g;
 
-            contentStr = contentStr.replace(RE, '<a text-decoration="underline" target="blank" href="$1">$1</a>');
+            contentStr = contentStr.replace(/((https|http)?:\/\/[^\s]+)/g, '<a text-decoration="underline" target="blank" href="$1">$1</a>');
 
             // Set the attributes and create the text
             conetentNode.setAttribute("x", 200);
-            conetentNode.setAttribute("style", "fill:" + color);
             conetentNode.innerHTML = contentStr;
+            conetentNode.setAttribute("style", "fill:" + color);
 
             // Add the name to the text node
             node.appendChild(conetentNode);
