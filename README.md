@@ -14,6 +14,7 @@ Description
 is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignment2/COMP4021_SVG_Proj_detail_2019F.pdf).
 
 > Final Mark: **96/100**
+
 > Remark: In the Highscore Table, if the current player is in the Top 5, then we should indicate it with another color.
 
 ## Assignment 3: PhP Chatroom
