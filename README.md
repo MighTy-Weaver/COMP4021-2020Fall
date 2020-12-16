@@ -1,10 +1,6 @@
 # COMP4021-Programming-Assignments
 
 This is the assignment repository for **COMP4021 Internet Computing** at HKUST in Fall 2020.
-```
-Assignment 1: 101/100
-Assignment 2: 96/100
-```
 
 ## Assignment 1: jQuery AutoComplete
 
