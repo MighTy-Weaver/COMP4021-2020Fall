@@ -17,7 +17,7 @@ is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignm
 
 > Remark: In the Highscore Table, if the current player is in the Top 5, then we should indicate it with another color.
 
-## Assignment 3: PhP Chatroom
+## Assignment 3: PHP Chatroom
 
 Description is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignment3/a3_2017f.pdf).
 
