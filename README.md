@@ -21,4 +21,4 @@ is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignm
 
 Description is [here](https://github.com/MighTy-Weaver/COMP4021-2020Fall/blob/master/Assignment3/a3_2017f.pdf).
 
-> Final Mark: **/100**
+> Final Mark: **100/100**
